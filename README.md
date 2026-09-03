@@ -2,20 +2,20 @@
 
 End-to-end data analysis project on Health & Wellness products sold on Shopee Thailand, covering data cleaning, exploratory data analysis, Power BI dashboards, and machine learning.
 
-## 📌 Project Overview
+## Project Overview
 
 This project analyzes ~68,000 raw product listings (cleaned down to ~2,600 unique items) from the Health & Wellness category on Shopee Thailand. The goal is to understand what drives revenue and sales in this category, and to practice a full data analyst workflow: cleaning → EDA → visualization → machine learning → business storytelling.
 
 **Tools used:** Python (pandas, NumPy, scikit-learn), Jupyter Notebook, Power BI
 
-## 📂 Dataset
+## Dataset
 
 - **Source:** Shopee Thailand, Health & Wellness category
 - **Raw size:** 68,499 rows
 - **After cleaning:** 2,622 unique product listings
 - **Columns:** Product ID, Section (category), Name, Price, Total Sold, Total Reviews, Shop Location
 
-## 🧹 Data Cleaning
+## Data Cleaning
 
 | Step | Action |
 |------|--------|
@@ -26,7 +26,7 @@ This project analyzes ~68,000 raw product listings (cleaned down to ~2,600 uniqu
 
 A deliberate decision was made to **keep** rows that share a Product ID but differ slightly in price — these likely reflect price updates or promotions over time rather than duplicate noise.
 
-## 📊 Exploratory Data Analysis — Key Insights
+## Exploratory Data Analysis — Key Insights
 
 - **Skin Nourishment** has the most listings (137) and the highest total revenue (฿36.6M), driven by high sales volume at a relatively low average price (฿301).
 - **Protein** products have the highest customer engagement, with a Review Rate of 4.34 — more than 3x the next closest category — suggesting strong buyer trust despite a higher price point (avg ฿952).
@@ -34,7 +34,7 @@ A deliberate decision was made to **keep** rows that share a Product ID but diff
 - **Price is only weakly correlated with sales** (Price vs. Total Sold: r = -0.16) — cheaper does not reliably mean more sales in this category.
 - **Rural provinces collectively out-earn Bangkok** (฿184M vs ฿164M total revenue), despite Bangkok having the most listings — provinces like Pattani and Sakon Nakhon show especially high average units sold per shop.
 
-## 📈 Power BI Dashboards
+## Power BI Dashboards
 
 **Dashboard 1 — Overview:** KPI cards (Total Products, Total Revenue, Avg Price), revenue by section, price segment breakdown, and a map of revenue distribution across Thailand, filterable by Section.
 
@@ -42,7 +42,7 @@ A deliberate decision was made to **keep** rows that share a Product ID but diff
 
 See `dashboard/dashboard_report.pdf` for a static view, or open `dashboard/Project_1.pbix` in Power BI Desktop for the full interactive experience.
 
-## 🤖 Machine Learning
+## Machine Learning
 
 Two regression problems were explored using Linear Regression and Random Forest:
 
@@ -56,13 +56,13 @@ Two regression problems were explored using Linear Regression and Random Forest:
 
 This process — noticing an unrealistically high score, diagnosing the cause, and re-running a corrected model — was treated as a core part of the analysis rather than a footnote.
 
-## 💡 Business Recommendations
+## Business Recommendations
 
 1. **Prioritize review generation over price-cutting.** Review Rate has ~1.5x the influence of Price on sales volume — incentivizing post-purchase reviews (e.g. small discounts for verified reviews) may be more effective than promotions.
 2. **Don't assume Bangkok is the primary market.** Rural provinces generate more total revenue collectively and show higher per-shop sales in several cases — there may be underserved demand worth targeting outside the capital.
 3. **Re-evaluate pricing strategy for "Protein" and similar high-trust categories.** High Review Rate alongside a higher average price suggests buyers in this segment are less price-sensitive and more trust-driven — premium positioning may be sustainable here.
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 shopee-health-wellness-analysis/
@@ -77,7 +77,7 @@ shopee-health-wellness-analysis/
     └── dashboard_report.pdf            # exported view of both dashboards
 ```
 
-## 🛠️ How to Reproduce
+## How to Reproduce
 
 ```bash
 pip install -r requirements.txt
