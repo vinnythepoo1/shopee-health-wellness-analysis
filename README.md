@@ -1,90 +1,203 @@
-# 🧴 Shopee Thailand Health & Wellness — Sales Analysis
+<div align="center">
 
-End-to-end data analysis project on Health & Wellness products sold on Shopee Thailand, covering data cleaning, exploratory data analysis, Power BI dashboards, and machine learning.
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=28&pause=1000&color=E8A838&center=true&vCenter=true&width=700&lines=Shopee+Health+%26+Wellness+Sales+Analysis;2%2C622+Products+%C2%B7+30+Sections+%C2%B7+%E0%B8%BF349M+Revenue;Python+%2B+Power+BI+%2B+Machine+Learning" alt="Typing SVG" />
 
-## 📌 Project Overview
+<br/>
 
-This project analyzes ~68,000 raw product listings (cleaned down to ~2,600 unique items) from the Health & Wellness category on Shopee Thailand. The goal is to understand what drives revenue and sales in this category, and to practice a full data analyst workflow: cleaning → EDA → visualization → machine learning → business storytelling.
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power_BI-Dashboard-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
+![pandas](https://img.shields.io/badge/pandas-Data_Wrangling-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
 
-**Tools used:** Python (pandas, NumPy, scikit-learn), Jupyter Notebook, Power BI
+![Status](https://img.shields.io/badge/status-complete-2EA043?style=flat-square)
+![Last Commit](https://img.shields.io/badge/maintained-2026-blue?style=flat-square)
 
-## 📂 Dataset
+</div>
 
-- **Source:** Shopee Thailand, Health & Wellness category
-- **Raw size:** 68,499 rows
-- **After cleaning:** 2,622 unique product listings
-- **Columns:** Product ID, Section (category), Name, Price, Total Sold, Total Reviews, Shop Location
+---
 
-## 🧹 Data Cleaning
+## The Question
 
-| Step | Action |
-|------|--------|
-| Duplicates | Removed ~96% duplicate rows (68,499 → 2,622) |
-| Price | Stripped currency symbol/commas, converted to float |
-| Total Sold / Total Reviews | Parsed Thai-language text (e.g. `"9,999+ ชิ้น"`), converted to numeric, filled missing values with 0 |
-| Shop Location | Dropped rows with no location AND no sales/review activity; filled remaining missing locations as `"Unknown"` |
+> **Skin care products dominate listings on Shopee Thailand — but does that mean they dominate revenue too? And what actually drives a product's sales volume when price barely correlates with it?**
 
-A deliberate decision was made to **keep** rows that share a Product ID but differ slightly in price — these likely reflect price updates or promotions over time rather than duplicate noise.
+This project is an end-to-end analysis of 68,499 raw Health & Wellness product listings from Shopee Thailand — deduplicated, cleaned, and pushed through a full **Python EDA → Power BI → Machine Learning** pipeline to answer that question with numbers, not assumptions.
 
-## 📊 Exploratory Data Analysis — Key Insights
+---
 
-- **Skin Nourishment** has the most listings (137) and the highest total revenue (฿36.6M), driven by high sales volume at a relatively low average price (฿301).
-- **Protein** products have the highest customer engagement, with a Review Rate of 4.34 — more than 3x the next closest category — suggesting strong buyer trust despite a higher price point (avg ฿952).
-- **89% of all products** are priced under ฿1,127, confirming this is a mass-market, price-accessible category.
-- **Price is only weakly correlated with sales** (Price vs. Total Sold: r = -0.16) — cheaper does not reliably mean more sales in this category.
-- **Rural provinces collectively out-earn Bangkok** (฿184M vs ฿164M total revenue), despite Bangkok having the most listings — provinces like Pattani and Sakon Nakhon show especially high average units sold per shop.
+## Table of Contents
 
-## 📈 Power BI Dashboards
+- [The Question](#the-question)
+- [Tech Stack](#tech-stack)
+- [Data Cleaning](#data-cleaning--what-got-fixed)
+- [EDA — Key Business Questions](#eda--key-business-questions)
+- [Power BI Dashboards](#power-bi-dashboards)
+- [Machine Learning](#machine-learning)
+- [Key Takeaways](#key-business-takeaways)
+- [Repo Structure](#repo-structure)
+- [How to Reproduce](#how-to-reproduce)
 
-**Dashboard 1 — Overview:** KPI cards (Total Products, Total Revenue, Avg Price), revenue by section, price segment breakdown, and a map of revenue distribution across Thailand, filterable by Section.
+---
 
-**Dashboard 2 — Deep Dive:** Top 10 products and locations by revenue, Bangkok vs. Rural comparison, revenue by price segment (treemap), price vs. sales scatter plot by section, and total reviews by section, filterable by Price Segment.
+## Tech Stack
 
-See `dashboard/dashboard_report.pdf` for a static view, or open `dashboard/Project_1.pbix` in Power BI Desktop for the full interactive experience.
+| Layer | Tools |
+|-------|-------|
+| **Data Cleaning & EDA** | Python (pandas, NumPy) |
+| **Machine Learning** | scikit-learn (LinearRegression, RandomForestRegressor) |
+| **Dashboard** | Power BI Desktop (2-page, interactive) |
+| **Version Control** | Git, GitHub |
 
-## 🤖 Machine Learning
+---
 
-Two regression problems were explored using Linear Regression and Random Forest:
+## Data Cleaning — What Got Fixed
 
-| Target | Best R² | Notes |
-|--------|---------|-------|
-| Predicting **Price** | 0.13 | Price is poorly explained by sales/review volume — likely driven by factors not in this dataset (brand, ingredients, packaging) |
-| Predicting **Total Sold** (initial) | 0.978 | Suspiciously high — investigated further |
-| Predicting **Total Sold** (after removing Total Reviews) | 0.372 | Reveals the true, more modest predictive signal |
+Raw Shopee data is messy. Here's what was actually found and fixed, not assumed away:
 
-**Finding — Data Leakage:** The initial 0.978 R² for predicting Total Sold was caused by data leakage: `Total Reviews` is a near-direct byproduct of `Total Sold` (you can only review what you've bought), so it told the model the answer rather than predicting it independently. After removing it, the more honest model — using Price, Review Rate, Section, and Location — achieved R² = 0.372, with **Review Rate (44%)** and **Price (31%)** emerging as the two most influential legitimate features.
+- **65,877 duplicate rows (96%)** removed — the raw file had near-identical listings repeated dozens of times per product.
+- **Price column** stored as Thai-formatted currency strings (`"฿9,999.00"`) — stripped and converted to float using regex `r'[^\d.]'`.
+- **Total Sold and Total Reviews** stored as Thai-language text (`"9,999+ ชิ้น"`, `"(7216)"`) — parsed with regex, converted to numeric, missing values filled with 0 where absence of a sale or review is the correct interpretation.
+- **Deliberate decision to keep** rows that share a Product ID but differ in price — these reflect price updates or promotional pricing over time, not duplicate noise. Documented explicitly rather than silently dropped.
+- After cleaning: **2,622 unique product listings**, zero nulls, all columns correctly typed.
 
-This process — noticing an unrealistically high score, diagnosing the cause, and re-running a corrected model — was treated as a core part of the analysis rather than a footnote.
+---
 
-## 💡 Business Recommendations
+## EDA — Key Business Questions
 
-1. **Prioritize review generation over price-cutting.** Review Rate has ~1.5x the influence of Price on sales volume — incentivizing post-purchase reviews (e.g. small discounts for verified reviews) may be more effective than promotions.
-2. **Don't assume Bangkok is the primary market.** Rural provinces generate more total revenue collectively and show higher per-shop sales in several cases — there may be underserved demand worth targeting outside the capital.
-3. **Re-evaluate pricing strategy for "Protein" and similar high-trust categories.** High Review Rate alongside a higher average price suggests buyers in this segment are less price-sensitive and more trust-driven — premium positioning may be sustainable here.
+Every analysis here answers a real question — not just "here's a bar chart."
 
-## 📁 Repository Structure
+**1. Which section actually drives the most revenue?**
+
+Skin Nourishment has the most listings (137) and the highest total revenue at **฿36.6M** — but not because it charges the most. It wins on volume: average 1,152 units sold per product at an average price of just ฿301. Protein products hold the #2 revenue spot with far fewer listings but a higher average price (฿952) and the strongest customer engagement of any section (Review Rate 4.34 — more than 3x the next closest).
+
+**2. Does price actually drive revenue?**
+
+No. The correlation between Price and Revenue is **r = -0.05** — essentially zero. Revenue is driven almost entirely by sales volume. A ฿9 product can and does out-earn a ฿5,600 product. Pricing strategy alone is not a lever for revenue growth in this category.
+
+**3. Is Bangkok the dominant market?**
+
+Not by total revenue. Rural provinces collectively generate **฿184M vs Bangkok's ฿164M** — despite Bangkok having more listings. Pattani and Sakon Nakhon have the highest average units sold per shop in the entire dataset. The assumption that Bangkok = the market does not hold.
+
+**4. What price range dominates the category?**
+
+**89% of all products are priced under ฿1,127.** Mid-Range (฿200–500) and Budget (under ฿200) each generate ~฿125M — essentially tied. This is a mass-market, volume-driven category, not a premium one.
+
+---
+
+## Power BI Dashboards
+
+Two pages, every visual answers a decision — not decoration.
+
+**Dashboard 1 — Overview**
+KPI cards (Total Products, Total Revenue, Average Price), revenue by section, price segment breakdown, and a geographic revenue map across Thailand — filterable by Section.
+
+**Dashboard 2 — Deep Dive**
+Top 10 products and locations by revenue, Bangkok vs Rural comparison, price vs average units sold by section (scatter), revenue by price segment (treemap), and total reviews by section — filterable by Price Segment.
+
+Static view: [`dashboard/dashboard_report.pdf`](dashboard/dashboard_report.pdf)
+Interactive: [`dashboard/Project_1.pbix`](dashboard/Project_1.pbix) — open in Power BI Desktop (free)
+
+---
+
+## Machine Learning
+
+> A two-stage regression exercise — included because catching a problem with a model is a more honest skill signal than only showing clean results.
+
+**The question:** can product features (price, section, location, review engagement) predict sales volume?
+
+**Stage 1 — Predicting Price**
+
+R² = 0.13. Price is not predictable from sales volume, reviews, or category. It appears to be set by factors outside this dataset — brand positioning, ingredient cost, packaging. This is a real finding, not a failure.
+
+**Stage 2 — Predicting Total Sold**
+
+Initial model: **R² = 0.978** — suspiciously high. Investigation revealed **data leakage**: `Total Reviews` is a near-direct byproduct of `Total Sold` (you can only review something you've already bought), so the model was using the answer to predict the answer.
+
+After removing `Total Reviews`:
+
+| Model | R² | Notes |
+|-------|-----|-------|
+| Linear Regression | 0.72 | Reasonable signal |
+| Random Forest | **0.372** | Honest result after leakage fix |
+
+**Feature Importance (post-fix):**
+
+| Feature | Importance |
+|---------|-----------|
+| Review Rate | 44% |
+| Price | 31% |
+| Location Type | 4% |
+| Section (all) | ~21% combined |
+
+Review Rate has **1.5x the influence of Price** on sales volume. Engagement — getting buyers to leave reviews — is a more effective lever than discounting.
+
+Full notebook: [`notebook/Lazada project.ipynb`](notebook/Lazada%20project.ipynb)
+
+---
+
+## Key Business Takeaways
+
+```
+1. Skin Nourishment wins on volume (฿36.6M), Protein wins on trust
+   (Review Rate 4.34x average) — two different paths to revenue.
+
+2. Price has near-zero correlation with revenue (r = -0.05).
+   Cutting prices is unlikely to move the needle.
+
+3. Rural provinces out-earn Bangkok in total revenue (฿184M vs ฿164M)
+   — an underserved market hiding in plain sight.
+
+4. 89% of the market is priced under ฿1,127.
+   This is a mass-market, volume-driven category, not a premium one.
+
+5. Review Rate (44%) drives sales more than Price (31%).
+   The highest-leverage action for a seller is generating more reviews,
+   not adjusting price.
+```
+
+---
+
+## Repo Structure
 
 ```
 shopee-health-wellness-analysis/
 ├── README.md
 ├── requirements.txt
+├── .gitignore
 ├── data/
-│   └── health_wellness_cleaned.csv     # cleaned dataset (output of the notebook)
+│   └── health_wellness_cleaned.csv     # cleaned dataset (2,622 rows)
 ├── notebook/
-│   └── projet.ipynb                    # full cleaning + EDA + ML workflow
+│   └── Lazada project.ipynb            # cleaning + EDA + ML
 └── dashboard/
-    ├── Project_1.pbix                  # Power BI file (Dashboard 1 & 2, interactive)
-    └── dashboard_report.pdf            # exported view of both dashboards
+    ├── Project_1.pbix                  # Power BI interactive file
+    └── dashboard_report.pdf            # static export of both dashboards
 ```
-
-## 🛠️ How to Reproduce
-
-```bash
-pip install -r requirements.txt
-jupyter notebook notebook/projet.ipynb
-```
-
-To view the dashboards: open `dashboard/dashboard_report.pdf` for a quick look, or open `dashboard/Project_1.pbix` in [Power BI Desktop](https://powerbi.microsoft.com/desktop/) (free) for the full interactive version with slicers and filters.
 
 ---
-*This project was built as part of a Data Analyst portfolio for a cooperative internship application, with a deliberate focus on EDA-first thinking and transparent, honest reporting of model limitations (including the data leakage finding) over inflated metrics.*
+
+## How to Reproduce
+
+```bash
+# 1. Clone
+git clone https://github.com/vinnythepoo1/shopee-health-wellness-analysis.git
+cd shopee-health-wellness-analysis
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Run the notebook
+jupyter notebook "notebook/Lazada project.ipynb"
+
+# 4. View dashboards
+# Quick look: open dashboard/dashboard_report.pdf
+# Interactive: open dashboard/Project_1.pbix in Power BI Desktop (free)
+```
+
+**Dataset:** Shopee Thailand, Health & Wellness category (August 2023)
+
+---
+
+<div align="center">
+
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=400&size=14&pause=1500&color=8FA6B2&center=true&vCenter=true&width=500&lines=Thanks+for+reading+-+questions+welcome!" alt="footer" />
+
+</div>
